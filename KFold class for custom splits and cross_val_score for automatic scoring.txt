@@ -1,0 +1,22 @@
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_iris
+import numpy as np
+
+# Load a sample dataset (Iris dataset)
+data = load_iris()
+X, y = data.data, data.target
+
+# Initialize KFold with 5 splits
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# Initialize the model (Random Forest Classifier in this case)
+model = RandomForestClassifier()
+
+# Perform cross-validation and calculate scores
+scores = cross_val_score(model, X, y, cv=kf)
+
+# Print cross-validation scores
+print("Cross-validation scores for each fold:", scores)
+print("Mean cross-validation score:", scores.mean())
+print("Standard deviation of cross-validation scores:", scores.std())

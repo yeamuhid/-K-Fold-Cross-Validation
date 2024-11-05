@@ -1,0 +1,41 @@
+from sklearn.model_selection import StratifiedKFold, RepeatedKFold, cross_validate
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.datasets import load_iris
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+
+# Load the dataset
+data = load_iris()
+X, y = data.data, data.target
+
+# Define Stratified K-Fold Cross Validator
+# Stratified ensures each fold has a similar class distribution as the whole dataset
+skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+
+# Initialize the model
+model = RandomForestClassifier()
+
+# Metrics to evaluate
+scoring = ['accuracy', 'precision_macro', 'recall_macro', 'f1_macro']
+
+# Perform cross-validation with multiple metrics
+cv_results = cross_validate(model, X, y, cv=skf, scoring=scoring, return_train_score=True)
+
+# Display results for each metric
+for metric in scoring:
+    print(f"{metric.capitalize()} per fold: {cv_results[f'test_{metric}']}")
+    print(f"Mean {metric.capitalize()}: {np.mean(cv_results[f'test_{metric}'])}")
+    print(f"Standard deviation of {metric.capitalize()}: {np.std(cv_results[f'test_{metric}'])}\n")
+
+# Optionally, convert results to a DataFrame for better visualization
+results_df = pd.DataFrame(cv_results)
+print(results_df[['test_accuracy', 'test_precision_macro', 'test_recall_macro', 'test_f1_macro']])
+
+# Plotting the performance metrics
+fig, ax = plt.subplots(1, 1, figsize=(10, 6))
+results_df[['test_accuracy', 'test_precision_macro', 'test_recall_macro', 'test_f1_macro']].plot(kind='box', ax=ax)
+ax.set_title("K-Fold Cross-Validation Performance Metrics")
+ax.set_ylabel("Score")
+plt.show()
